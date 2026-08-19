@@ -66,7 +66,9 @@
   id: "ggb",
   material: none,
   app: "classic",
-  perspective: none,
+  // "G" ist die Grafikansicht ohne Algebrafenster — in echten Decks wurde sie
+  // in 9 von 9 Aufrufen von Hand gesetzt.
+  perspective: "G",
   language: none,
   grid: auto,
   axes: auto,
@@ -75,7 +77,8 @@
   animation-button: false,
   codebase: "https://www.geogebra.org/apps/",
   width: 100%,
-  height: 260pt,
+  // Gemessen an echten Decks: 8 von 9 Aufrufen setzten rund 330pt.
+  height: 330pt,
   at: "1-",
   fallback: none,
   link: none,
