@@ -54,7 +54,7 @@ function play(jobs,sofort){for(var i=0;i<(jobs||[]).length;i++)apply(jobs[i],sof
 // one across the room. What comes of it is reported here and put into the
 // other copy. Only what a hand touched: an animation running on both sides
 // anyway would otherwise send sixty values a second for nothing.
-var beruehrt=0,los=0,takt=0,offen={};
+var beruehrt=0,los=0,takt=0,offen={},offenSicht=0;
 function melde(s){try{parent.postMessage({typstage:1,spiegel:__ID__,stand:s},"*");}catch(e){}}
 function typVon(n){try{return api.getObjectType(n);}catch(e){return "";}}
 // A point travels as two numbers, a slider as one. Everything else takes the
@@ -82,16 +82,40 @@ function sammle(n){
  try{if(api.isMoveable&&!api.isMoveable(n))return;}catch(e){}
  offen[n]=1;
  if(takt)return;
- takt=requestAnimationFrame(function(){
-  takt=0;var o=offen;offen={};
-  for(var n in o){var s=standVon(n);if(s)melde(s);}
- });
+ takt=requestAnimationFrame(flut);
+}
+function flut(){
+ takt=0;var o=offen;offen={};
+ for(var n in o){var s=standVon(n);if(s)melde(s);}
+ if(offenSicht){offenSicht=0;var v=sichtStand();if(v)melde(v);}
+}
+// Schieben und Zoomen feuern so dicht wie ein Zug, deshalb derselbe Takt.
+function sammleSicht(){
+ if(!beruehrt)return;
+ offenSicht=1;
+ if(!takt)takt=requestAnimationFrame(flut);
 }
 // Something was created, deleted or renamed. That cannot be described per
 // object, so the whole construction goes across.
 function sammleAlles(){
  if(!beruehrt)return;
  try{melde({t:"all",x:api.getXML()});}catch(e){}
+}
+// Der sichtbare Bereich, so wie `setCoordSystem` ihn wieder annimmt. Nicht
+// aus dem Ereignis gelesen: `registerClientListener` reicht ein *Array*
+// durch, gemessen `["viewChanged2D",""]`, und darin steht kein einziger
+// Zahlenwert. Wer `ev.xZero` liest, bekommt `undefined`, und das wanderte
+// bisher stumm hinüber.
+//
+// Und der Bereich, nicht Nullpunkt und Maßstab: er ist von der Pixelgröße
+// des Applets unabhängig. Weicht der Rahmen drüben um ein Pixel ab, sieht
+// der Saal trotzdem denselben Ausschnitt.
+function sichtStand(){
+ try{
+  var v=JSON.parse(api.getViewProperties(0));
+  return {t:"view", x1:v.xMin, x2:v.xMin+v.width*v.invXscale,
+                    y1:v.yMin, y2:v.yMin+v.height*v.invYscale};
+ }catch(e){return null;}
 }
 function spiegelAn(s){
  try{
@@ -101,7 +125,7 @@ function spiegelAn(s){
   else if(s.t==="v")api.setValue(s.n,s.v);
   else if(s.t==="x")api.evalXML(s.x);
   else if(s.t==="all")api.setXML(s.x);
-  else if(s.t==="view")api.setCoordSystem(s.a,s.b,s.c,s.d);
+  else if(s.t==="view")api.setCoordSystem(s.x1,s.x2,s.y1,s.y2);
  }catch(e){}
 }
 // The window in which a change counts as made by hand. `pointerup` alone is
@@ -121,6 +145,9 @@ function beruehrung(){
  // Änderung mitwandern und nicht stumm hier liegen bleiben.
  addEventListener("keydown",an,true);
  addEventListener("keyup",ab,true);
+ // Und das Rad. Zoomen ist weder ein Druck noch eine Taste, wäre also keine
+ // Hand gewesen und der Saal hätte den neuen Ausschnitt nicht gesehen.
+ addEventListener("wheel",function(){an();ab();},true);
 }
 
 function run(m){
@@ -159,10 +186,18 @@ function passe(){
  if(!api)return;
  var w=Math.round(innerWidth),h=Math.round(innerHeight);
  if(w<40||h<40||(w===breit&&h===hoch))return;
+ // Der sichtbare Bereich soll die Größenänderung überstehen. `setSize` lässt
+ // den Maßstab stehen, also zeigte ein gewachsener Kasten mehr Ebene als
+ // vorher -- und wenn nur eines der beiden Fenster seine Größe nachträglich
+ // findet, sieht der Saal danach etwas anderes als der Vortragende. Beim
+ // ersten Mal nicht: da steht noch der Bereich des Platzhalters, und der hat
+ // ein ganz anderes Seitenverhältnis.
+ var alt=breit?sichtStand():null;
  breit=w;hoch=h;
  // `setSize` is the documented way; older applets only know the two
  // single setters.
  try{if(api.setSize)api.setSize(w,h);else{api.setWidth(w);api.setHeight(h);}}catch(e){}
+ if(alt)try{api.setCoordSystem(alt.x1,alt.x2,alt.y1,alt.y2);}catch(e){}
  try{api.recalculateEnvironments();}catch(e){}
 }
 // The applet starts before its frame has a size — when it grows it has to
@@ -186,8 +221,7 @@ p.appletOnLoad=function(a){
   // although it is the most visible thing a hand does here.
   a.registerClientListener(function(ev){
    var t=ev&&(ev.type||ev[0]);
-   if(t!=="viewChanged2D"||!beruehrt)return;
-   melde({t:"view",a:ev.xZero,b:ev.yZero,c:ev.xscale,d:ev.yscale});
+   if(t==="viewChanged2D")sammleSicht();
   });
  }catch(e){}
  a.getBase64(function(b){
