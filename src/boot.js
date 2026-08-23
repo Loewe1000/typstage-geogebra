@@ -157,7 +157,12 @@ function run(m){
  // gleich geblieben sein und nur der Zoom sich geändert haben; dann fällt
  // hier kein `resize`, und ohne diese Meldung bliebe die Zeichenfläche
  // stehen, wo sie war.
- if(m.mass){passe(1);return;}
+ if(m.mass){
+  if(m.w)pktBreit=m.w;
+  if(m.h)pktHoch=m.h;
+  passe(1);
+  return;
+ }
  if(!live){q=[m];return;}
  if(busy){pending=m;return;}
  if(m.stop){stopTweens();try{api.stopAnimation();}catch(e){}return;}
@@ -187,6 +192,12 @@ addEventListener("message",function(e){run(e.data);});
 // the slide has been laid out, and the applet then drew a third the width of
 // the box it sat in.
 var breit=0,hoch=0;
+// Der Kasten in Punkten der Folie, vom Kern gemeldet. In jedem Fenster
+// dieselbe Zahl, gleich wie groß der Bildschirm ist.
+var pktBreit=0,pktHoch=0;
+// GeoGebras Vorgabe sind 50 Bildschirmpunkte je Einheit. Auf die Folie
+// bezogen ergibt das in jedem Fenster denselben Ausschnitt.
+var JE_EINHEIT=50;
 function setzeGroesse(w,h){
  try{if(api.setSize)api.setSize(w,h);else{api.setWidth(w);api.setHeight(h);}}catch(e){}
 }
@@ -194,31 +205,7 @@ function leinwand(){
  var c=document.querySelector("canvas");
  return c?c.getBoundingClientRect():null;
 }
-// Nachmessen und einmal nachbessern.
-//
-// `setSize` wird nicht überall so genommen, wie es gemeint ist. Gemessen in
-// Safari, Rahmen 423 Punkte breit und mit 1,66 auf die Bühne gezoomt: nach
-// `setSize(423,262)` war die Zeichenfläche 253 Punkte breit, füllte den
-// Rahmen also zu 60 Prozent, und die Konstruktion stand entsprechend
-// geschrumpft in ihrem Kasten. In Chrome fällt das nicht auf. Der Fehler
-// hängt am Zoom: verkleinert man das Fenster, bis der Zoom bei 1 liegt, sitzt
-// sie wieder.
-//
-// Warum es so ist, muss man nicht wissen, um es zu heilen: was zu klein kam,
-// wird im selben Verhältnis größer verlangt. Gemessen schwingt sich das in
-// einem Durchgang ein, von 0,60 auf 1,00, und ein zweiter Versuch ändert
-// nichts mehr. Die Schranken halten einen Ausreißer davon ab, sich
-// aufzuschaukeln.
-function nachbessern(w,h,alt){
- var c=leinwand();
- if(c&&c.width>10&&c.height>10&&(Math.abs(c.width-w)>2||Math.abs(c.height-h)>2)){
-  var fx=w/c.width, fy=h/c.height;
-  if(fx>0.2&&fx<5&&fy>0.2&&fy<5)setzeGroesse(Math.round(w*fx),Math.round(h*fy));
- }
- // Der Bereich zuletzt: jede Größenänderung verschiebt ihn wieder.
- if(alt)try{api.setCoordSystem(alt.x1,alt.x2,alt.y1,alt.y2);}catch(e){}
- try{api.recalculateEnvironments();}catch(e){}
-}
+
 function passe(erzwinge){
  if(!api)return;
  var w=Math.round(innerWidth),h=Math.round(innerHeight);
@@ -236,11 +223,21 @@ function passe(erzwinge){
  // ersten Mal nicht: da steht noch der Bereich des Platzhalters, und der hat
  // ein ganz anderes Seitenverhältnis.
  var alt=breit?sichtStand():null;
+ // Beim ersten Mal steht noch der Ausschnitt des Platzhalters da, und der hat
+ // ein ganz anderes Seitenverhältnis. Statt ihn zu retten, wird er aus den
+ // Punktmaßen der Folie neu gesetzt -- so sieht jedes Fenster denselben
+ // Ausschnitt, ohne dass ein `ggb-view` im Deck stehen muss.
+ if(!alt&&pktBreit>0&&pktHoch>0){
+  alt={x1:-pktBreit/2/JE_EINHEIT, x2:pktBreit/2/JE_EINHEIT,
+       y1:-pktHoch/2/JE_EINHEIT,  y2:pktHoch/2/JE_EINHEIT};
+ }
  breit=w;hoch=h;
  setzeGroesse(w,h);
- // Erst im nächsten Anlauf nachmessen: unmittelbar danach steht die alte
- // Zeichenfläche noch da, und die Nachbesserung rechnete mit ihr.
- setTimeout(function(){nachbessern(w,h,alt);},60);
+ // Sofort und nicht später: der Bereich muss vor dem nächsten Job stehen.
+ // Verzögert überschrieb er ein `ggb-view`, das in der Zwischenzeit
+ // eingetroffen war, mit dem alten Ausschnitt.
+ if(alt)try{api.setCoordSystem(alt.x1,alt.x2,alt.y1,alt.y2);}catch(e){}
+ try{api.recalculateEnvironments();}catch(e){}
 }
 // The applet starts before its frame has a size — when it grows it has to
 // take the new one, otherwise it stays small inside a large area.

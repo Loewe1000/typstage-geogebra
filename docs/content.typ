@@ -309,15 +309,22 @@ ein.
 == Größe
 
 `width` und `height` geben die Größe in den Maßen der Folie -- nicht in
-Bildschirmpunkten. Um das Applet kümmert sich die Laufzeit: sie setzt den
-Rahmen auf die Foliengröße und vergrößert ihn dann mit `zoom`, nicht mit
-`transform: scale()`.
+Bildschirmpunkten.
 
-Der Unterschied ist zu sehen. Eine Skalierung dehnt das fertige Rasterbild:
-das Applet hat 400 Pixel breit gezeichnet und würde auf 460 aufgeblasen --
-unscharf. `zoom` wirkt vor dem Rastern; das innere Fenster bleibt bei 400
-Punkten, seine Pixeldichte steigt mit. Das Applet sieht so auf jeder
-Bildschirmgröße denselben Ausschnitt, gestochen scharf.
+Für die meisten Einbettungen spannt die Laufzeit den Rahmen in Punkten der
+Folie auf und vergrößert ihn dann mit `zoom`. Ein Applet ist davon ausgenommen
+und bekommt echte Bildschirmpunkte. Der Grund ist gemessen: Safari rechnet
+diesen Zoom bei GeoGebra doppelt ein -- ein Leinwandpuffer von 1400 Punkten bei
+253 Punkten Breite, also Zoom mal Zoom mal Bildschirmdichte. Das Applet
+zeichnete zu klein, und wer die Größe dagegen korrigierte, verschob dafür den
+Trefferpunkt: es zeichnete dann richtig, glaubte sich aber 704 Punkte breit,
+während es 424 breit gezeigt wurde, und ein Punkt ließ sich nur noch greifen,
+wenn man weit rechts daneben klickte.
+
+Dass trotzdem in jedem Fenster derselbe Ausschnitt zu sehen ist, hängt deshalb
+nicht an der Pixelzahl, sondern am Bereich. Den setzt das Applet beim ersten
+Mal aus den Punktmaßen des Kastens, mit GeoGebras 50 Punkten je Einheit; danach
+gilt, was `ggb-view` sagt, und eine Größenänderung lässt den Bereich stehen.
 
 #tip[
   Zwei Applets nebeneinander stehen am besten in einem `grid`, jedes mit

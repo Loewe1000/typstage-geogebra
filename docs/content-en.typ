@@ -334,17 +334,23 @@ shows GeoGebra's play button.
 == Size
 
 `width` and `height` give the size in the measurements of the slide, not in
-screen pixels. The runtime takes care of the applet: it sets the frame to the
-slide size and then enlarges it with `zoom` rather than with
-`transform: scale()`.
+screen pixels.
 
-The difference can be seen. A scale stretches the finished raster image: the
-applet drew 400 pixels wide and would be blown up to 460, blurry. `zoom` acts
-before rasterising; the inner window stays at 400 points and its pixel density
-rises with it. The applet therefore sees the same crop at every screen size,
-perfectly sharp.
+For most embeds the runtime spans the frame in points of the slide and then
+enlarges it with `zoom`. An applet is exempt and gets real screen pixels
+instead. The reason is measured: Safari counts that zoom twice for GeoGebra, a
+canvas buffer of 1400 points at a width of 253, which is zoom times zoom times
+pixel density. The applet drew too small, and correcting its size instead
+moved the place where it could be hit: it then drew correctly but believed
+itself 704 points wide while being shown 424 wide, and a point could only be
+grabbed by clicking far to the right of it.
 
-The applet takes its size from that inner window, not from a number written at
+That every window still shows the same crop therefore does not hang on the
+pixel count but on the range. The applet sets that from the box in slide
+points the first time, at GeoGebra's 50 points per unit; after that `ggb-view`
+decides, and a change of size leaves the range where it is.
+
+The applet takes its pixel size from the frame, not from a number written at
 compile time. `width: 100%` cannot be a number before the slide has been laid
 out, and an applet that guessed one drew a third of the box it sat in.
 
