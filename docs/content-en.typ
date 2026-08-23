@@ -423,6 +423,15 @@ as `Delete`, stays with the applet.
   on a key as well as on a press.
 ]
 
+#tip[
+  Whatever is not meant to move belongs fixed. `ggb-style("A", "B",
+  fixed: true)` pins down the points that merely span a construction.
+  Otherwise a hand easily grabs the wrong one during a talk: with Thales the
+  diameter rather than the point on the half circle, and the whole arc travels
+  with it. Measured on the example deck: with `fixed`, neither a drag on A nor
+  one on the arc moves anything, and C still runs along its path.
+]
+
 One difference is worth knowing when building for this: `Point(k)` is a point
 on the path that a hand can take; `Point(k, 0.3)` is pinned to that parameter
 and cannot be dragged at all, and `isMoveable` answers false for it. Where it

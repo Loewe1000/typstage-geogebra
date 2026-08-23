@@ -396,6 +396,15 @@ außerhalb dieser Menge, `Entf` etwa, bleibt beim Applet.
   Spiegelung wach ist, öffnet sich auf eine Taste ebenso wie auf einen Druck.
 ]
 
+#tip[
+  Was sich nicht bewegen soll, gehört festgehalten. `ggb-style("A", "B",
+  fixed: true)` nagelt die Punkte fest, die eine Konstruktion nur aufspannen.
+  Sonst greift eine Hand im Vortrag leicht den Falschen: beim Satz des Thales
+  etwa den Durchmesser statt des Punktes auf dem Halbkreis, und der ganze
+  Bogen wandert mit. Gemessen am Beispiel-Deck: mit `fixed` bewegt weder ein
+  Zug an A noch einer am Bogen irgendetwas, und C läuft weiter auf seiner Bahn.
+]
+
 Beim Bauen dafür lohnt ein Unterschied: `Point(k)` ist ein Punkt auf der Bahn,
 den eine Hand nehmen kann; `Point(k, 0.3)` ist auf diesen Parameter festgelegt
 und lässt sich gar nicht ziehen -- `isMoveable` antwortet dort mit falsch. Wo er

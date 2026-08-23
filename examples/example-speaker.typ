@@ -108,7 +108,11 @@
     // along and would put it back.
     ggb-view(at: "1-", x: (-4.2, 4.2), y: (-1.0, 4.2), grid: false)
     ggb-style("k", at: "1-", color: luma(45%), thickness: 3)
-    ggb-style("A", "B", at: "1-", color: luma(35%), point-size: 4)
+    // Festgehalten, und das ist keine Kosmetik. A und B spannen den Durchmesser
+    // auf; wer sie mitzieht, verschiebt den ganzen Halbkreis, und das ist genau
+    // das, was hier nicht gezeigt werden soll. Frei bleibt allein C, und damit
+    // greift eine Hand auf dieser Folie immer das Richtige.
+    ggb-style("A", "B", at: "1-", color: luma(35%), point-size: 4, fixed: true)
 
     // `Point(k)` and not `Point(k, 0.3)`. The second form pins the point to
     // that parameter and makes it dependent: it draws in the same place and
