@@ -75,6 +75,14 @@
   seamless: true,
   background: auto,
   animation-button: false,
+  // Den Ausschnitt zieht die Folie, nicht die Hand. Wer im Vortrag danebengreift,
+  // schöbe sonst die ganze Ebene weg. `true` gibt das Verschieben und Zoomen
+  // zurück, wo es zur Sache gehört.
+  pan: false,
+  // Die Schrift des Applets in Punkten der Folie, so wie `width` und `height`
+  // zählen. Sie wächst deshalb mit der Folie mit, statt auf dem Beamer winzig
+  // zu bleiben.
+  font-size: 16,
   codebase: "https://www.geogebra.org/apps/",
   width: 100%,
   // Measured against real decks: 8 calls out of 9 set about 330pt.
@@ -97,7 +105,7 @@
   embed(
     html: applet-document(id, material, app, perspective, language, grid, axes,
                           seamless, bg, animation-button, codebase,
-                          start, height.pt()),
+                          start, height.pt(), pan, font-size),
     bridge: id,
     // Kein `zoom` für ein Applet. Der Kern spannt einen Rahmen sonst in
     // Punkten der Folie auf und vergrößert ihn danach, und GeoGebra rechnet

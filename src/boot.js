@@ -160,6 +160,7 @@ function run(m){
  if(m.mass){
   if(m.w)pktBreit=m.w;
   if(m.h)pktHoch=m.h;
+  if(m.px)schriftSetzen(m.px);
   passe(1);
   return;
  }
@@ -198,6 +199,28 @@ var pktBreit=0,pktHoch=0;
 // GeoGebras Vorgabe sind 50 Bildschirmpunkte je Einheit. Auf die Folie
 // bezogen ergibt das in jedem Fenster denselben Ausschnitt.
 var JE_EINHEIT=50;
+// Die Schrift des Applets in Punkten der Folie, und der zuletzt gemeldete
+// Maßstab auf den Bildschirm.
+var GRUNDSCHRIFT=__SCHRIFT__, massstab=0;
+
+// Achsenzahlen und Beschriftungen wachsen mit der Folie.
+//
+// Der Rahmen eines Applets wird nicht gezoomt (siehe `lib.typ`), also setzt
+// GeoGebra in echten Bildschirmpunkten -- und seine Schrift bliebe damit
+// physisch gleich groß, auf dem Beamer also im Verhältnis winzig. Sie wird
+// deshalb mit dem Maßstab mitgeführt: `font-size` zählt in Punkten der Folie,
+// so wie `width` und `height` es tun.
+function schriftSetzen(px){
+ // Der Maßstab wird auch dann gemerkt, wenn er noch nicht anzuwenden ist:
+ // die Meldung des Kerns kommt, bevor das Applet lebt. Wer ihn nur merkt und
+ // die Anwendung dem nächsten Mal überlässt, wartet vergebens -- ein zweites
+ // Mal mit derselben Zahl kommt nicht.
+ if(px)massstab=px;
+ if(!api||!massstab)return;
+ var s=Math.round(GRUNDSCHRIFT*massstab);
+ if(s<10)s=10; if(s>60)s=60;
+ try{api.setGlobalOptions({fontSize:s});}catch(e){}
+}
 function setzeGroesse(w,h){
  try{if(api.setSize)api.setSize(w,h);else{api.setWidth(w);api.setHeight(h);}}catch(e){}
 }
@@ -249,6 +272,8 @@ p.appletOnLoad=function(a){
  // Before the base is taken, so a reset restores the applet at the size it
  // actually has on the slide.
  passe();
+ // Jetzt gibt es ein `api`, also nachholen, was vor dem Laden gemeldet wurde.
+ schriftSetzen(0);
  beruehrung();
  try{
   a.registerUpdateListener(sammle);

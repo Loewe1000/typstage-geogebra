@@ -319,6 +319,24 @@ geogebra(height: 240pt, seamless: false)   // with GeoGebra's own frame
   faintly grey box. `background: themes.lesson.paper` is the way to say it.
 ]
 
+#warning[
+  The viewport cannot be dragged by hand, and that is the default. Whoever
+  reaches beside the point during a talk would otherwise push the whole plane
+  away and the construction would be gone. Reported from use, not invented.
+  `pan: true` gives dragging and zooming back where they belong to the matter;
+  points and sliders can be dragged either way.
+]
+
+`font-size` is the applet's type, counted in points of the slide, the way
+`width` and `height` are. It therefore grows with the slide instead of staying
+at its physical size on a projector. The default is 16; a large room wants
+more.
+
+#show-code[```typ
+geogebra(height: 240pt, font-size: 22)      // larger axis numbers
+geogebra(height: 240pt, pan: true)          // viewport by hand
+```]
+
 `grid` and `axes` leave GeoGebra's own default alone as long as they are
 `auto`, and force one or the other otherwise. `perspective: "G"` shows the
 graphics view alone, `app` chooses the GeoGebra app (the default is

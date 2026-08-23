@@ -294,6 +294,24 @@ geogebra(height: 240pt, background: rgb("#f4f1ea"))
 geogebra(height: 240pt, seamless: false)   // mit GeoGebras eigenem Rahmen
 ```]
 
+#warning[
+  Der Ausschnitt lässt sich mit der Hand nicht verschieben, und das ist die
+  Vorgabe. Wer im Vortrag danebengreift, schöbe sonst die ganze Ebene weg, und
+  die Konstruktion wäre fort -- gemeldet aus dem Gebrauch, nicht ausgedacht.
+  `pan: true` gibt Verschieben und Zoomen zurück, wo sie zur Sache gehören;
+  Punkte und Schieber lassen sich in beiden Fällen ziehen.
+]
+
+`font-size` ist die Schrift des Applets, gezählt in Punkten der Folie -- so wie
+`width` und `height` es tun. Sie wächst deshalb mit der Folie mit, statt auf
+dem Beamer in ihrer physischen Größe stehenzubleiben. Vorgabe ist 16; für einen
+großen Saal ist mehr richtig.
+
+#show-code[```typ
+geogebra(height: 240pt, font-size: 22)      // größere Achsenzahlen
+geogebra(height: 240pt, pan: true)          // Ausschnitt von Hand
+```]
+
 `grid` und `axes` lassen GeoGebras Vorgabe stehen, solange sie `auto` sind,
 und erzwingen sonst das eine oder andere. `perspective: "G"` zeigt nur die
 Grafik-Ansicht, `app` wählt die GeoGebra-App (Vorgabe `"classic"`), `language`

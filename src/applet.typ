@@ -21,6 +21,7 @@
 #let applet-document(
   name, material, app, perspective, language, grid, axes,
   seamless, background, animation-button, codebase, width, height,
+  pan, font-size,
 ) = {
   let params = (
     appName: app,
@@ -28,6 +29,10 @@
     height: int(calc.round(height)),
     showToolBar: false, showAlgebraInput: false, showMenuBar: false,
     enableRightClick: false, showResetIcon: false,
+    // Den Ausschnitt zieht die Folie, nicht die Hand. Wer im Vortrag danebengreift,
+    // schöbe sonst die ganze Ebene weg, und die Konstruktion ist fort. `pan: true`
+    // gibt es zurück, wo das Verschieben zur Sache gehört.
+    enableShiftDragZoom: pan,
     showAnimationButton: animation-button,
     ..if seamless { (borderColor: "none") },
     ..if material != none { (material_id: material) },
@@ -40,6 +45,7 @@
     .replace("__PARAMS__", json.encode(params))
     .replace("__ID__", json.encode(name))
     .replace("__CODEBASE__", "")
+    .replace("__SCHRIFT__", str(calc.round(font-size)))
     .replace("__BOOTVIEW__", if seamless {
       "try{a.setGraphicsOptions(1,{bgColor:" + json.encode(background.to-hex()) + "});}catch(e){}"
     } else { "" })
