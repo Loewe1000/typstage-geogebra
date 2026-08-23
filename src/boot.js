@@ -153,6 +153,11 @@ function beruehrung(){
 function run(m){
  if(!m||m.typstage!==1)return;
  if(m.spiegel&&m.stand){if(live)spiegelAn(m.stand);return;}
+ // Der Kern hat den Rahmen neu bemessen. Das innere Fenster kann dabei
+ // gleich geblieben sein und nur der Zoom sich geändert haben; dann fällt
+ // hier kein `resize`, und ohne diese Meldung bliebe die Zeichenfläche
+ // stehen, wo sie war.
+ if(m.mass){passe(1);return;}
  if(!live){q=[m];return;}
  if(busy){pending=m;return;}
  if(m.stop){stopTweens();try{api.stopAnimation();}catch(e){}return;}
@@ -182,10 +187,48 @@ addEventListener("message",function(e){run(e.data);});
 // the slide has been laid out, and the applet then drew a third the width of
 // the box it sat in.
 var breit=0,hoch=0;
-function passe(){
+function setzeGroesse(w,h){
+ try{if(api.setSize)api.setSize(w,h);else{api.setWidth(w);api.setHeight(h);}}catch(e){}
+}
+function leinwand(){
+ var c=document.querySelector("canvas");
+ return c?c.getBoundingClientRect():null;
+}
+// Nachmessen und einmal nachbessern.
+//
+// `setSize` wird nicht überall so genommen, wie es gemeint ist. Gemessen in
+// Safari, Rahmen 423 Punkte breit und mit 1,66 auf die Bühne gezoomt: nach
+// `setSize(423,262)` war die Zeichenfläche 253 Punkte breit, füllte den
+// Rahmen also zu 60 Prozent, und die Konstruktion stand entsprechend
+// geschrumpft in ihrem Kasten. In Chrome fällt das nicht auf. Der Fehler
+// hängt am Zoom: verkleinert man das Fenster, bis der Zoom bei 1 liegt, sitzt
+// sie wieder.
+//
+// Warum es so ist, muss man nicht wissen, um es zu heilen: was zu klein kam,
+// wird im selben Verhältnis größer verlangt. Gemessen schwingt sich das in
+// einem Durchgang ein, von 0,60 auf 1,00, und ein zweiter Versuch ändert
+// nichts mehr. Die Schranken halten einen Ausreißer davon ab, sich
+// aufzuschaukeln.
+function nachbessern(w,h,alt){
+ var c=leinwand();
+ if(c&&c.width>10&&c.height>10&&(Math.abs(c.width-w)>2||Math.abs(c.height-h)>2)){
+  var fx=w/c.width, fy=h/c.height;
+  if(fx>0.2&&fx<5&&fy>0.2&&fy<5)setzeGroesse(Math.round(w*fx),Math.round(h*fy));
+ }
+ // Der Bereich zuletzt: jede Größenänderung verschiebt ihn wieder.
+ if(alt)try{api.setCoordSystem(alt.x1,alt.x2,alt.y1,alt.y2);}catch(e){}
+ try{api.recalculateEnvironments();}catch(e){}
+}
+function passe(erzwinge){
  if(!api)return;
  var w=Math.round(innerWidth),h=Math.round(innerHeight);
- if(w<40||h<40||(w===breit&&h===hoch))return;
+ if(w<40||h<40)return;
+ // Auch bei gleicher Größe neu setzen, wenn die Zeichenfläche nicht passt:
+ // ein Fenster, das nur den Zoom ändert, lässt das innere Fenster in Ruhe,
+ // und dann gäbe es sonst nichts, was den Sitz wieder herstellt.
+ var c0=leinwand();
+ var sitzt=c0&&Math.abs(c0.width-w)<=2&&Math.abs(c0.height-h)<=2;
+ if(!erzwinge&&w===breit&&h===hoch&&sitzt)return;
  // Der sichtbare Bereich soll die Größenänderung überstehen. `setSize` lässt
  // den Maßstab stehen, also zeigte ein gewachsener Kasten mehr Ebene als
  // vorher -- und wenn nur eines der beiden Fenster seine Größe nachträglich
@@ -194,11 +237,10 @@ function passe(){
  // ein ganz anderes Seitenverhältnis.
  var alt=breit?sichtStand():null;
  breit=w;hoch=h;
- // `setSize` is the documented way; older applets only know the two
- // single setters.
- try{if(api.setSize)api.setSize(w,h);else{api.setWidth(w);api.setHeight(h);}}catch(e){}
- if(alt)try{api.setCoordSystem(alt.x1,alt.x2,alt.y1,alt.y2);}catch(e){}
- try{api.recalculateEnvironments();}catch(e){}
+ setzeGroesse(w,h);
+ // Erst im nächsten Anlauf nachmessen: unmittelbar danach steht die alte
+ // Zeichenfläche noch da, und die Nachbesserung rechnete mit ihr.
+ setTimeout(function(){nachbessern(w,h,alt);},60);
 }
 // The applet starts before its frame has a size — when it grows it has to
 // take the new one, otherwise it stays small inside a large area.
