@@ -1,7 +1,16 @@
 # typstage-geogebra
 
-GeoGebra applets for [typstage](../typstage). The construction is built by
-GeoGebra, the dramaturgy comes from the slides.
+GeoGebra applets for [typstage](https://github.com/Loewe1000/typstage). The
+construction is built by GeoGebra, the dramaturgy comes from the slides.
+
+**Try it without installing anything:** [two example
+decks](https://loewe1000.github.io/typstage-geogebra/beispiele/) running in
+your browser. One shows the slides driving the applet, the other shows a hand
+driving it from the speaker window.
+
+The manual is available in
+[English](https://loewe1000.github.io/typstage-geogebra/en.html) and in
+[German](https://loewe1000.github.io/typstage-geogebra/).
 
 ```typ
 #import "@schule/typstage:0.1.0": *
@@ -94,7 +103,7 @@ A step change resets both copies from the base as before, so a change made by
 hand lasts as long as the step does. If a position is meant to survive, put it
 in the deck with `ggb-set` and drag on from there.
 
-`example-speaker.typ` is a deck built around this: Thales with a point to walk
+[`examples/example-speaker.typ`](examples/example-speaker.typ) is a deck built around this: Thales with a point to walk
 along the half circle, and a parabola with two sliders. Open it, press `n`,
 press `m`, and drag.
 

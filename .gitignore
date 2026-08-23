@@ -6,3 +6,6 @@ docs/build/
 *.pdf
 
 .DS_Store
+
+# Die gebaute Website
+_site/

@@ -11,6 +11,7 @@ keywords = ["presentation", "geogebra", "typstage"]
 categories = ["presentation"]
 disciplines = ["education", "mathematics"]
 
-# Nicht mitausliefern: die Beispieldatei ist zum Ausprobieren da,
-# nicht Teil des Pakets — und sie zieht CeTZ als Abhängigkeit nach.
-exclude = ["example.typ", "example-speaker.typ"]
+# Nicht mitausliefern: die Beispiele sind zum Ausprobieren da, nicht Teil des
+# Pakets — und eines davon zieht CeTZ als Abhängigkeit nach. Sie liegen in
+# `examples/`, weil der Bau der Website dort nach ihnen sucht.
+exclude = ["examples"]

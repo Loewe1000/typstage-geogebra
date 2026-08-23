@@ -358,7 +358,7 @@ den eine Hand nehmen kann; `Point(k, 0.3)` ist auf diesen Parameter festgelegt
 und lässt sich gar nicht ziehen -- `isMoveable` antwortet dort mit falsch. Wo er
 starten soll, sagt `position:`.
 
-`example-speaker.typ` ist ein Deck genau dazu: Thales mit einem Punkt, der über
+`examples/example-speaker.typ` ist ein Deck genau dazu: Thales mit einem Punkt, der über
 den Halbkreis wandert, und eine Parabel mit zwei Schiebern.
 
 = API-Referenz
