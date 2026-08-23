@@ -329,8 +329,18 @@ geogebra(height: 240pt, seamless: false)   // with GeoGebra's own frame
 
 `font-size` is the applet's type, counted in points of the slide, the way
 `width` and `height` are. It therefore grows with the slide instead of staying
-at its physical size on a projector. The default is 16; a large room wants
-more.
+at its physical size on a projector.
+
+The default is 20 rather than GeoGebra's 16. Measured on rendered pictures, the
+axis numbers are then 0.71 as tall as the slide's body text; at 16 they are
+0.62. The first reads as a subordinate label, the second as an afterthought.
+
+#warning[
+  GeoGebra snaps the size to steps. Measured, it jumps between 20 and 21: the
+  axis numbers go from 0.71 to 1.12 of the body text and are then as large as
+  it is. Setting a value in between therefore need not give you a step in
+  between.
+]
 
 #show-code[```typ
 geogebra(height: 240pt, font-size: 22)      // larger axis numbers

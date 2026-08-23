@@ -304,8 +304,18 @@ geogebra(height: 240pt, seamless: false)   // mit GeoGebras eigenem Rahmen
 
 `font-size` ist die Schrift des Applets, gezählt in Punkten der Folie -- so wie
 `width` und `height` es tun. Sie wächst deshalb mit der Folie mit, statt auf
-dem Beamer in ihrer physischen Größe stehenzubleiben. Vorgabe ist 16; für einen
-großen Saal ist mehr richtig.
+dem Beamer in ihrer physischen Größe stehenzubleiben.
+
+Vorgabe ist 20 und nicht GeoGebras 16. An gerenderten Bildern gemessen sind die
+Achsenzahlen damit 0,71 so hoch wie der Fließtext der Folie, bei 16 nur 0,62 --
+das eine ist eine untergeordnete Beschriftung, das andere ein Nachgedanke.
+
+#warning[
+  GeoGebra rastet die Größe in Stufen ein. Gemessen springt sie zwischen 20 und
+  21: die Achsenzahlen gehen von 0,71 auf 1,12 des Fließtextes und sind dann so
+  groß wie er. Wer einen Zwischenwert setzt, bekommt deshalb nicht unbedingt
+  einen Zwischenschritt.
+]
 
 #show-code[```typ
 geogebra(height: 240pt, font-size: 22)      // größere Achsenzahlen

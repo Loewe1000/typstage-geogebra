@@ -80,9 +80,12 @@
   // zurück, wo es zur Sache gehört.
   pan: false,
   // Die Schrift des Applets in Punkten der Folie, so wie `width` und `height`
-  // zählen. Sie wächst deshalb mit der Folie mit, statt auf dem Beamer winzig
-  // zu bleiben.
-  font-size: 16,
+  // zählen; sie wächst deshalb mit der Folie mit. 20 statt GeoGebras 16, an
+  // gerenderten Bildern gemessen. Die Achsenzahlen sind damit 0,71 so hoch wie
+  // der Fließtext der Folie, bei 16 nur 0,62. GeoGebra rastet die Größe in
+  // Stufen ein, und die nächste liegt schon bei 21, wo die Zahlen auf 1,12
+  // springen und so groß werden wie der Text. 20 ist die letzte Stufe davor.
+  font-size: 20,
   codebase: "https://www.geogebra.org/apps/",
   width: 100%,
   // Measured against real decks: 8 calls out of 9 set about 330pt.
