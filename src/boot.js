@@ -48,8 +48,77 @@ function apply(j,sofort){
  if(bad.length)try{parent.postMessage({typstage:1,failed:bad,who:__ID__},"*");}catch(e){}
 }
 function play(jobs,sofort){for(var i=0;i<(jobs||[]).length;i++)apply(jobs[i],sofort);}
+// ── Mirroring, the second route from the speaker view ─────────────────────
+//
+// In pointer mode the speaker operates the applet in front of them, not the
+// one across the room. What comes of it is reported here and put into the
+// other copy. Only what a hand touched: an animation running on both sides
+// anyway would otherwise send sixty values a second for nothing.
+var beruehrt=0,los=0,takt=0,offen={};
+function melde(s){try{parent.postMessage({typstage:1,spiegel:__ID__,stand:s},"*");}catch(e){}}
+function typVon(n){try{return api.getObjectType(n);}catch(e){return "";}}
+// A point travels as two numbers, a slider as one. Everything else takes the
+// long way round through its XML, which is correct for any object and too
+// expensive to use for the two cases above.
+function standVon(n){
+ var t=typVon(n);
+ try{
+  if(t==="point"||t==="vector")
+   return {n:n,t:"p",x:api.getXcoord(n),y:api.getYcoord(n),z:api.getZcoord(n)};
+  if(t==="numeric"||t==="angle")return {n:n,t:"v",v:api.getValue(n)};
+  return {n:n,t:"x",x:api.getXML(n)};
+ }catch(e){return null;}
+}
+// One report per object and frame. A drag fires the listener at the rate of
+// the screen, and every value but the last is stale before it arrives.
+// Only what a hand can move. `registerUpdateListener` fires for every object
+// that recomputed, so dragging one point on a half circle reported the point,
+// both segments and the angle, four states for one movement. The three
+// dependent ones are not merely redundant, since the other side works them
+// out from the point by itself: their XML redefines them over there, and that
+// wipes the trace the dragged point had just left behind.
+function sammle(n){
+ if(!beruehrt)return;
+ try{if(api.isMoveable&&!api.isMoveable(n))return;}catch(e){}
+ offen[n]=1;
+ if(takt)return;
+ takt=requestAnimationFrame(function(){
+  takt=0;var o=offen;offen={};
+  for(var n in o){var s=standVon(n);if(s)melde(s);}
+ });
+}
+// Something was created, deleted or renamed. That cannot be described per
+// object, so the whole construction goes across.
+function sammleAlles(){
+ if(!beruehrt)return;
+ try{melde({t:"all",x:api.getXML()});}catch(e){}
+}
+function spiegelAn(s){
+ try{
+  // Two arguments for a point in the plane, three only where there really is
+  // a third.
+  if(s.t==="p"){if(s.z)api.setCoords(s.n,s.x,s.y,s.z);else api.setCoords(s.n,s.x,s.y);}
+  else if(s.t==="v")api.setValue(s.n,s.v);
+  else if(s.t==="x")api.evalXML(s.x);
+  else if(s.t==="all")api.setXML(s.x);
+  else if(s.t==="view")api.setCoordSystem(s.a,s.b,s.c,s.d);
+ }catch(e){}
+}
+// The window in which a change counts as made by hand. `pointerup` alone is
+// too early: GeoGebra settles a dragged object one turn later, and that last
+// value is the one that matters.
+function beruehrung(){
+ addEventListener("pointerdown",function(){beruehrt=1;if(los){clearTimeout(los);los=0;}},true);
+ addEventListener("pointerup",function(){
+  if(los)clearTimeout(los);
+  los=setTimeout(function(){beruehrt=0;los=0;},400);
+ },true);
+ addEventListener("pointercancel",function(){beruehrt=0;},true);
+}
+
 function run(m){
  if(!m||m.typstage!==1)return;
+ if(m.spiegel&&m.stand){if(live)spiegelAn(m.stand);return;}
  if(!live){q=[m];return;}
  if(busy){pending=m;return;}
  if(m.stop){stopTweens();try{api.stopAnimation();}catch(e){}return;}
@@ -58,6 +127,9 @@ function run(m){
   try{api.setRepaintingActive(false);}catch(e){}
   api.setBase64(base,function(){
    try{api.setRepaintingActive(false);}catch(e){}
+   // The base carries the size it was taken at. If it brought a different
+   // one back, the next `passe` has to see that, so the memory is cleared.
+   breit=0;hoch=0;passe();
    play(m.jobs,true);
    try{api.setRepaintingActive(true);}catch(e){}
    busy=false;var n=pending;pending=null;if(n)run(n);});
@@ -65,18 +137,60 @@ function run(m){
  play(m.jobs,false);
 }
 addEventListener("message",function(e){run(e.data);});
+
+// ── The applet's size ─────────────────────────────────────────────────────
+//
+// The frame is spanned in points of the slide and then zoomed onto the
+// stage, so the inner viewport is the box's size in the slide's own units:
+// the same number in the talk and in the speaker view, whatever size the two
+// windows have. That is the only figure that is right here. A number written
+// in at compile time cannot be, because `width: 100%` is only settled once
+// the slide has been laid out, and the applet then drew a third the width of
+// the box it sat in.
+var breit=0,hoch=0;
+function passe(){
+ if(!api)return;
+ var w=Math.round(innerWidth),h=Math.round(innerHeight);
+ if(w<40||h<40||(w===breit&&h===hoch))return;
+ breit=w;hoch=h;
+ // `setSize` is the documented way; older applets only know the two
+ // single setters.
+ try{if(api.setSize)api.setSize(w,h);else{api.setWidth(w);api.setHeight(h);}}catch(e){}
+ try{api.recalculateEnvironments();}catch(e){}
+}
 // The applet starts before its frame has a size — when it grows it has to
-// recompute, otherwise it stays small inside a large area.
-addEventListener("resize",function(){try{api.recalculateEnvironments();}catch(e){}});
+// take the new one, otherwise it stays small inside a large area.
+addEventListener("resize",passe);
 var p=__PARAMS__;
 p.appletOnLoad=function(a){
  api=a;
  __BOOTVIEW__
- try{a.recalculateEnvironments();}catch(e){}
+ // Before the base is taken, so a reset restores the applet at the size it
+ // actually has on the slide.
+ passe();
+ beruehrung();
+ try{
+  a.registerUpdateListener(sammle);
+  a.registerAddListener(sammleAlles);
+  a.registerRemoveListener(sammleAlles);
+  a.registerRenameListener(sammleAlles);
+  a.registerClearListener(sammleAlles);
+  // Panning and zooming change no object and would otherwise not travel,
+  // although it is the most visible thing a hand does here.
+  a.registerClientListener(function(ev){
+   var t=ev&&(ev.type||ev[0]);
+   if(t!=="viewChanged2D"||!beruehrt)return;
+   melde({t:"view",a:ev.xZero,b:ev.yZero,c:ev.xscale,d:ev.yscale});
+  });
+ }catch(e){}
  a.getBase64(function(b){
   base=b;live=true;
   var r=q;q=[];for(var i=0;i<r.length;i++)run(r[i]);
-  try{parent.postMessage({typstage:1,ready:__ID__},"*");}catch(e){}});
+  // `spiegel` is the announcement that this document can be operated
+  // locally and reports the result. Without it the runtime keeps the
+  // pointer away from the frame in the speaker view and takes the other
+  // route, which is right for a document that cannot do this.
+  try{parent.postMessage({typstage:1,ready:__ID__,spiegel:1},"*");}catch(e){}});
 };
 __CODEBASE__
 new GGBApplet(p,true).inject("ts-ggb");

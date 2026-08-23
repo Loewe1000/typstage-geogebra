@@ -66,8 +66,8 @@
   id: "ggb",
   material: none,
   app: "classic",
-  // "G" ist die Grafikansicht ohne Algebrafenster — in echten Decks wurde sie
-  // in 9 von 9 Aufrufen von Hand gesetzt.
+  // "G" is the graphics view without the algebra pane. In real decks it was
+  // set by hand in 9 calls out of 9.
   perspective: "G",
   language: none,
   grid: auto,
@@ -77,7 +77,7 @@
   animation-button: false,
   codebase: "https://www.geogebra.org/apps/",
   width: 100%,
-  // Gemessen an echten Decks: 8 von 9 Aufrufen setzten rund 330pt.
+  // Measured against real decks: 8 calls out of 9 set about 330pt.
   height: 330pt,
   at: "1-",
   fallback: none,
@@ -88,10 +88,16 @@
   let id = if name.pos().len() == 1 { name.pos().first() } else { id }
   let id = if type(id) == label { str(id) } else { id }
   let bg = if background == auto { paper } else { background }
+  // The size the applet is injected at is a placeholder and nothing more. Its
+  // real one is the frame's inner viewport, which the applet takes for itself
+  // once the slide has been laid out, and again whenever the box changes.
+  // `width: 100%` has no value here at all: what a percentage comes to is not
+  // known until the layout runs, and it is the usual case.
+  let start = if type(width) == length { width.pt() } else { height.pt() }
   embed(
     html: applet-document(id, material, app, perspective, language, grid, axes,
                           seamless, bg, animation-button, codebase,
-                          260.0, height.pt()),
+                          start, height.pt()),
     bridge: id,
     width: width, height: height, at: at,
     fallback: fallback, link: link,

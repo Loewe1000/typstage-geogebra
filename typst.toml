@@ -13,4 +13,4 @@ disciplines = ["education", "mathematics"]
 
 # Nicht mitausliefern: die Beispieldatei ist zum Ausprobieren da,
 # nicht Teil des Pakets — und sie zieht CeTZ als Abhängigkeit nach.
-exclude = ["example.typ"]
+exclude = ["example.typ", "example-speaker.typ"]

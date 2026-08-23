@@ -186,6 +186,12 @@ ggb-view(at: 2, x: (-3, 3), y: (-3, 3), grid: false)
 ggb-view(at: 3, axes: false)
 ```]
 
+Das Applet nimmt die Maße des Kastens an, in dem es steht, und behält sie über
+Schrittwechsel und Fenstergrößen hinweg. Wie viel Welt dabei zu sehen ist,
+hängt also an `width` und `height` der `geogebra`-Zeile: ein breiter Kasten
+zeigt mehr x-Bereich. Wer einen bestimmten Ausschnitt will, sagt ihn mit
+`ggb-view` statt ihn sich aus der Breite zu ergeben.
+
 = Bewegung
 
 Es gibt zwei Arten, etwas in Bewegung zu setzen, und sie tun Verschiedenes.
@@ -317,6 +323,43 @@ Bildschirmgröße denselben Ausschnitt, gestochen scharf.
   Zwei Applets nebeneinander stehen am besten in einem `grid`, jedes mit
   `width: 100%` und eigener Höhe.
 ]
+
+= Aus der Sprecheransicht
+
+Das Sprecherfenster von typstage führt von jedem Applet eine eigene Kopie. `m`
+schaltet dort den Zeiger vom Stift auf die Einbettung um, und von da an ist das
+Applet vor dem Vortragenden das lebende: einen Punkt ziehen, einen Schieber
+schieben, den Ausschnitt verschieben -- die Kopie auf der Leinwand zieht nach.
+
+Hinüber geht nur, was eine Hand bewegen kann: ein Punkt als seine Koordinaten,
+ein Schieber als sein Wert. Alles, was daraus folgt, bleibt liegen, denn die
+andere Kopie rechnet es sich selbst aus. Wird etwas angelegt, gelöscht oder
+umbenannt, geht stattdessen die ganze Konstruktion.
+
+#tip[
+  Gemessen: ein Punkt auf einem Halbkreis meldete beim Ziehen vier Zustände je
+  Bild -- den Punkt, beide Strecken und den Winkel. Die drei abhängigen sind
+  nicht nur überflüssig, ihr XML definiert sie drüben neu, und das wischt die
+  Spur weg, die der gezogene Punkt gerade gelegt hatte.
+]
+
+Nur was eine Hand berührt hat, wird gemeldet. Eine Animation, die ohnehin auf
+beiden Seiten läuft, schickt deshalb nichts.
+
+#warning[
+  Ein Schrittwechsel setzt beide Kopien wie bisher aus der Basis zurück und
+  spielt die Jobs der Folie erneut. Eine Änderung von Hand lebt also so lange
+  wie der Schritt. Soll eine Position bleiben, gehört sie mit `ggb-set` ins
+  Deck.
+]
+
+Beim Bauen dafür lohnt ein Unterschied: `Point(k)` ist ein Punkt auf der Bahn,
+den eine Hand nehmen kann; `Point(k, 0.3)` ist auf diesen Parameter festgelegt
+und lässt sich gar nicht ziehen -- `isMoveable` antwortet dort mit falsch. Wo er
+starten soll, sagt `position:`.
+
+`example-speaker.typ` ist ein Deck genau dazu: Thales mit einem Punkt, der über
+den Halbkreis wandert, und eine Parabel mit zwei Schiebern.
 
 = API-Referenz
 

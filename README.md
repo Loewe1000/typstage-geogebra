@@ -63,6 +63,11 @@ ggb-run("B=(1,1)", target: "right")
 Leave `target` out there and it does not guess — it says which applets it found
 and stops. A dropped command is far harder to notice than a failed build.
 
+The applet takes the size of the box it stands in and keeps it across step
+changes and window sizes, so how much of the plane is on screen follows from
+`width` and `height`. Where a particular range matters, say it with `ggb-view`
+rather than letting the box width decide it.
+
 `ggb-tween` counts a value up frame by frame — build an object that depends on
 it and the construction draws itself.
 
@@ -71,3 +76,28 @@ construction with `ggb-run` or load it through `material`.
 
 In the PDF there is no applet. `fallback` puts your own drawing there instead,
 `link` at least the way to the live one.
+
+## From the speaker view
+
+The speaker window of typstage runs its own copy of every applet, and `m`
+switches its pointer from the pen to the embedded frame. In that mode the
+applet in front of you is the live one: drag a point, move a slider, pan the
+view, and the projected copy follows. Only what a hand touched travels, so an
+animation running on both sides sends nothing.
+
+What crosses is what a hand can move: a point as its coordinates, a slider as
+its value. Everything that follows from those is left alone, because the other
+copy works it out for itself. Creating, deleting or renaming sends the whole
+construction instead.
+
+A step change resets both copies from the base as before, so a change made by
+hand lasts as long as the step does. If a position is meant to survive, put it
+in the deck with `ggb-set` and drag on from there.
+
+`example-speaker.typ` is a deck built around this: Thales with a point to walk
+along the half circle, and a parabola with two sliders. Open it, press `n`,
+press `m`, and drag.
+
+One thing to know when you build for it: `Point(k)` is a point on the path that
+a hand can take, `Point(k, 0.3)` is pinned to that parameter and cannot be
+dragged at all. Say where it starts with `position:` instead.
