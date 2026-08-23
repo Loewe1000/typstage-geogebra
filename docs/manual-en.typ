@@ -32,9 +32,12 @@
     without applets never loads the bridge script.
   ],
   links: (
-    (name: "GitHub", url: "https://github.com/Loewe1000/Typst-Schule"),
+    (name: "GitHub", url: "https://github.com/Loewe1000/typstage-geogebra"),
     (name: "Examples", url: "https://loewe1000.github.io/typstage-geogebra/beispiele/"),
     (name: "typstage", url: "https://github.com/Loewe1000/typstage"),
+    // Absolute, not relative: the same entry stands on the title page of the
+    // PDF, and there a path leads nowhere.
+    (name: "Deutsch", url: "https://loewe1000.github.io/typstage-geogebra/"),
   ),
   notices: ([Companion package to `typstage`],),
 )

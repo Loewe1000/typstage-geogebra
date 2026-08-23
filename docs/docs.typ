@@ -21,9 +21,12 @@
     Applets das Brückenskript nicht mitlädt.
   ],
   links: (
-    (name: "GitHub", url: "https://github.com/Loewe1000/Typst-Schule"),
+    (name: "GitHub", url: "https://github.com/Loewe1000/typstage-geogebra"),
     (name: "Beispiele", url: "https://loewe1000.github.io/typstage-geogebra/beispiele/"),
-    (name: "typstage", url: "https://github.com/Loewe1000/Typst-Schule"),
+    (name: "typstage", url: "https://github.com/Loewe1000/typstage"),
+    // Absolut, nicht relativ: derselbe Eintrag steht auch auf der Titelseite
+    // des PDFs, und dort führt ein Pfad ins Leere.
+    (name: "English", url: "https://loewe1000.github.io/typstage-geogebra/en.html"),
   ),
   notices: ([Begleitpaket zu `typstage`],),
 )
