@@ -353,6 +353,24 @@ beiden Seiten läuft, schickt deshalb nichts.
   Deck.
 ]
 
+== Die Tastatur
+
+Wer das Applet anklickt, gibt ihm den Fokus, und von da an landet jede Taste
+darin. Nachgemessen, bevor darüber entschieden wurde: der Fokus sitzt auf der
+Zeichenfläche des Applets, es sieht jede geprüfte Taste, ruft bei keiner
+`preventDefault` und ändert nichts an der Konstruktion. Ohne Werkzeugleiste und
+ohne Eingabezeile hat dieses Applet für die Tastatur keine Verwendung.
+
+Der Kern reicht die Tasten des Vortrags deshalb aus dem Rahmen zurück, sodass
+Blättern und `m` auch mit dem Applet im Fokus weiter tun, was sie sollen. Alles
+außerhalb dieser Menge, `Entf` etwa, bleibt beim Applet.
+
+#info[
+  Sollte sich das je ändern, etwa mit eingeblendeter Werkzeugleiste, wandert
+  eine mit der Tastatur gemachte Änderung mit: das Fenster, in dem die
+  Spiegelung wach ist, öffnet sich auf eine Taste ebenso wie auf einen Druck.
+]
+
 Beim Bauen dafür lohnt ein Unterschied: `Point(k)` ist ein Punkt auf der Bahn,
 den eine Hand nehmen kann; `Point(k, 0.3)` ist auf diesen Parameter festgelegt
 und lässt sich gar nicht ziehen -- `isMoveable` antwortet dort mit falsch. Wo er

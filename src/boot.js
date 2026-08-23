@@ -108,12 +108,19 @@ function spiegelAn(s){
 // too early: GeoGebra settles a dragged object one turn later, and that last
 // value is the one that matters.
 function beruehrung(){
- addEventListener("pointerdown",function(){beruehrt=1;if(los){clearTimeout(los);los=0;}},true);
- addEventListener("pointerup",function(){
-  if(los)clearTimeout(los);
-  los=setTimeout(function(){beruehrt=0;los=0;},400);
- },true);
+ var an=function(){beruehrt=1;if(los){clearTimeout(los);los=0;}};
+ var ab=function(){if(los)clearTimeout(los);
+  los=setTimeout(function(){beruehrt=0;los=0;},400);};
+ addEventListener("pointerdown",an,true);
+ addEventListener("pointerup",ab,true);
  addEventListener("pointercancel",function(){beruehrt=0;},true);
+ // Auch die Tastatur zählt als Hand. Gemessen tut dieses Applet mit keiner
+ // Taste etwas -- ohne Werkzeugleiste und ohne Eingabezeile hat es für sie
+ // keine Verwendung, und der Kern reicht sie deshalb an den Vortrag weiter.
+ // Käme das je anders, etwa mit eingeblendeter Werkzeugleiste, dann soll die
+ // Änderung mitwandern und nicht stumm hier liegen bleiben.
+ addEventListener("keydown",an,true);
+ addEventListener("keyup",ab,true);
 }
 
 function run(m){

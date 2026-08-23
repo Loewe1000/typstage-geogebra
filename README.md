@@ -1,7 +1,13 @@
 # typstage-geogebra
 
-GeoGebra applets for [typstage](https://github.com/Loewe1000/typstage). The
+GeoGebra applets for [**typstage**](https://github.com/Loewe1000/typstage), the
+package that makes animated HTML presentations from a single Typst file. The
 construction is built by GeoGebra, the dramaturgy comes from the slides.
+
+This one only puts applets on those slides. Everything else, the steps, the
+magic move, the speaker view and the PDF from the same source, is the core's
+and is documented there: [manual](https://loewe1000.github.io/typstage/en.html),
+[example decks](https://loewe1000.github.io/typstage/beispiele/).
 
 **Try it without installing anything:** [two example
 decks](https://loewe1000.github.io/typstage-geogebra/beispiele/) running in

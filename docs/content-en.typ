@@ -381,6 +381,24 @@ anyway therefore sends nothing.
   position is meant to stay, it belongs in the deck with `ggb-set`.
 ]
 
+== The keyboard
+
+Click the applet and it holds the focus, so every key then lands inside it.
+Measured before deciding what to do about that: focus sits on the applet's
+canvas, it sees every key tried, it calls `preventDefault` on none of them, and
+it changes nothing in the construction. Without a toolbar and without an
+algebra input this applet has no use for the keyboard at all.
+
+The core therefore hands the keys of the talk back out of the frame, so paging
+and `m` keep working with the applet in focus. Anything outside that set, such
+as `Delete`, stays with the applet.
+
+#info[
+  Should that ever change, with a toolbar shown for instance, a change made
+  with the keyboard travels too: the window in which the mirror is awake opens
+  on a key as well as on a press.
+]
+
 One difference is worth knowing when building for this: `Point(k)` is a point
 on the path that a hand can take; `Point(k, 0.3)` is pinned to that parameter
 and cannot be dragged at all, and `isMoveable` answers false for it. Where it
